@@ -1,24 +1,29 @@
 package com.example.bankaccountservice.web;
 
+import com.example.bankaccountservice.dto.BankAccountRequestDTO;
+import com.example.bankaccountservice.dto.BankAccountResponseDTO;
 import com.example.bankaccountservice.entities.BankAccount;
 import com.example.bankaccountservice.repositories.BankAccountRepository;
+import com.example.bankaccountservice.services.BankAccountService;
 import java.util.List;
-import java.util.UUID;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AccountRestController {
   private BankAccountRepository bankAccountRepository;
+  private BankAccountService bankAccountService;
 
-  public AccountRestController(BankAccountRepository bankAccountRepository){
+  public AccountRestController(BankAccountRepository bankAccountRepository,
+      BankAccountService bankAccountService){
     this.bankAccountRepository = bankAccountRepository;
+    this.bankAccountService = bankAccountService;
   }
 
   @GetMapping("/bankAccounts")
@@ -32,9 +37,9 @@ public class AccountRestController {
   }
 
   @PostMapping("/bankAccounts")
-  public BankAccount saveBankAccount(@RequestBody BankAccount bankAccount){
-    if (bankAccount.getId() == null)bankAccount.setId(UUID.randomUUID().toString());
-    return bankAccountRepository.save(bankAccount);
+  public ResponseEntity<BankAccountResponseDTO> saveBankAccount(@RequestBody BankAccountRequestDTO bankAccountRequestDTO) {
+    BankAccountResponseDTO responseDTO = bankAccountService.addAccount(bankAccountRequestDTO);
+    return ResponseEntity.ok(responseDTO);
   }
 
   @PutMapping("/bankAccounts/{id}")
